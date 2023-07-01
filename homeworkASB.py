@@ -1,41 +1,30 @@
 from Bio import Entrez
 import sys
 
-# Set the email address to use for Entrez queries
-Entrez.email = "your.email@example.com"
+Entrez.email = "youremail@email.com"
 
-search_term = sys.argv[1]
-database = sys.argv[2]
-
-# Define search function
-def Esearch(search_term,database):
-    handle = Entrez.esearch(db=database, term=search_term, usehistory='y')
+def Esearch(database,searchterm):
+    handle = Entrez.esearch(db=database, term=searchterm,usehistory='y')
     record = Entrez.read(handle)
-    print(record)
     return record
 
-
-record = Esearch(search_term,database)
-query_key = record['QueryKey']
-webenv = record['WebEnv']
-
-
-
-#Show the WebEnv and QueryKey of the History
 def History(record):
-
-    print(record["QueryKey"])
-    print(record["WebEnv"])
-
-History(record)
-
-
- #Use Entrez efetch to fetch the sequences
-def Efetch(query_key,webenv,database):
-
-    fhandle = Entrez.efetch(db=database,query_key=query_key,WebEnv=webenv,rettype='fasta')
+    
+    querykey = record["QueryKey"]
+    webenv = record["WebEnv"]
+    y = querykey + "\n" + webenv
+    return y
+    
+def Efetch(database,record):
+    querykey = record["QueryKey"]
+    webenv = record["WebEnv"]
+    fhandle = Entrez.efetch(db=database,query_key=querykey,WebEnv=webenv,rettype = "fasta")
     sequences = fhandle.read()
     fhandle.close()
-    print(sequences)
+    return sequences
 
-Efetch(query_key,webenv,database)
+if __name__ == '__main__':
+    record = Esearch(sys.argv[1], sys.argv[2])
+    print(record)
+    print(History(record))
+    print(Efetch(sys.argv[1],record))
